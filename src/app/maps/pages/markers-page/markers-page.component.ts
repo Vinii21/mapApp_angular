@@ -2,6 +2,11 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { LngLat, Map, Marker } from 'maplibre-gl';
 
+interface markersAndColors {
+  color: string,
+  marker: Marker
+}
+
 @Component({
   templateUrl: './markers-page.component.html',
   styleUrls: ['./markers-page.component.css']
@@ -12,6 +17,8 @@ export class MarkersPageComponent implements AfterViewInit {
 
   public map?: Map;
   public currentLngLat: LngLat = new LngLat(-118.805, 34.027)
+
+  public markers: markersAndColors[] = [];
 
 
   ngAfterViewInit(): void {
@@ -56,5 +63,15 @@ export class MarkersPageComponent implements AfterViewInit {
       .setLngLat(this.currentLngLat)
       .addTo(this.map);
 
+      this.markers.push({
+        color,
+        marker
+      });
+
+  }
+
+  deleteMarker(index: number): void {
+    this.markers[index].marker.remove();
+    this.markers.splice(index, 1);
   }
 }
