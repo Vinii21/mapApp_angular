@@ -6,6 +6,7 @@
       backgroundColor: marker.color
     }"
     (dblclick)="deleteMarker(i)"
+    (click)="flyTo(marker.marker)"
   >
     Marker {{i + 1}}
   </li>
