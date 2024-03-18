@@ -7,6 +7,11 @@ interface markersAndColors {
   marker: Marker
 }
 
+interface PlainMarker {
+  color: string;
+  lngLat: number[]
+}
+
 @Component({
   templateUrl: './markers-page.component.html',
   styleUrls: ['./markers-page.component.css']
@@ -31,6 +36,9 @@ export class MarkersPageComponent implements AfterViewInit {
       center: this.currentLngLat // starting location [longitude, latitude]
     });
 
+    /* Aqui cargo los marcadores desde el localstorage */
+    this.readFromLocalStorage();
+
     //Con esto creamos un marcador personalizado para el mapa
     /* const markerHtml = document.createElement('div');
     markerHtml.innerHTML = "Vini"; */
@@ -51,6 +59,9 @@ export class MarkersPageComponent implements AfterViewInit {
     const lgnLat = this.map.getCenter();
 
     this.addMarker(lgnLat, color);
+
+    /* Aquí guardo el marcador en el localstorage */
+    this.saveToLocalStorage();
   }
 
   addMarker(lngLat: LngLat, color: string): void {
@@ -60,13 +71,19 @@ export class MarkersPageComponent implements AfterViewInit {
       color,
       draggable: true,
     })
-      .setLngLat(this.currentLngLat)
+      .setLngLat(lngLat)
       .addTo(this.map);
 
       this.markers.push({
         color,
         marker
       });
+    this.saveToLocalStorage();
+
+    marker.on('dragend', () => {
+      console.log(marker.getLngLat())
+      this.saveToLocalStorage();
+    });
 
   }
 
@@ -81,4 +98,31 @@ export class MarkersPageComponent implements AfterViewInit {
       center: marker.getLngLat()
     })
   }
+
+  saveToLocalStorage() {
+    console.log("cambio el local")
+    const plainMarkers: PlainMarker[] = this.markers.map( ({color, marker})=> {
+      return {
+        color,
+        lngLat: marker.getLngLat().toArray()
+      }
+    });
+
+    localStorage.setItem('plainMarkers', JSON.stringify(plainMarkers));
+
+  }
+
+  readFromLocalStorage() {
+    console.log("Ejecutado")
+    const plainMarkersString = localStorage.getItem('plainMarkers') ?? '[]';
+    const plainMarkers: PlainMarker[] = JSON.parse( plainMarkersString );
+
+    plainMarkers.forEach(({color, lngLat}) => {
+      const [lng, lat] = lngLat;
+      const coords = new LngLat(lng, lat);
+
+      this.addMarker(coords, color);
+    })
+   }
+
 }
