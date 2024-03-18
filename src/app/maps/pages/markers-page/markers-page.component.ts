@@ -100,7 +100,7 @@ export class MarkersPageComponent implements AfterViewInit {
   }
 
   saveToLocalStorage() {
-    console.log("cambio el local")
+
     const plainMarkers: PlainMarker[] = this.markers.map( ({color, marker})=> {
       return {
         color,
@@ -113,7 +113,7 @@ export class MarkersPageComponent implements AfterViewInit {
   }
 
   readFromLocalStorage() {
-    console.log("Ejecutado")
+
     const plainMarkersString = localStorage.getItem('plainMarkers') ?? '[]';
     const plainMarkers: PlainMarker[] = JSON.parse( plainMarkersString );
 
